@@ -43,6 +43,7 @@ h2{font-size:1.45rem;line-height:1.15;display:flex;align-items:center;gap:8px}
 #brandImg{display:inline-flex;gap:4px;align-items:center}
 @media (max-width:520px){#brandImg img{height:30px}}
 .credits{font-size:.78rem;color:var(--muted);text-align:center}
+.credits a,.gsec a{color:var(--gem);text-underline-offset:2px}
 h3{font-size:1.15rem;font-weight:400}
 p{margin:0}
 .num{font-family:var(--body);font-feature-settings:var(--numfeat);font-variant-numeric:tabular-nums lining-nums}
@@ -302,7 +303,7 @@ details.gph[open]>summary{margin-bottom:8px}
 
   <nav class="tabs" role="tablist" id="tabs"></nav>
   <main id="view"></main>
-  <p class="credits">App non ufficiale, fatta da giocatori. Idle Obelisk Miner, il suo nome e le sue immagini appartengono ai suoi sviluppatori; le immagini vengono dalla wiki (shminer.miraheze.org). Crediti completi in «I tuoi dati».</p>
+  <p class="credits">App non ufficiale, fatta da giocatori. Idle Obelisk Miner, il suo nome e le sue immagini appartengono ai suoi sviluppatori. Dati, formule e testi delle guide sono adattati dalla <a href="https://shminer.miraheze.org" target="_blank" rel="noopener">wiki di Idle Obelisk Miner</a> con licenza <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>; anche le immagini del gioco vengono dalla wiki. Crediti completi in «I tuoi dati».</p>
 </div>
 
 <script>
@@ -2021,10 +2022,11 @@ const fxText=(e)=>!e?"":e.net>0.5?`<span class="good num">+${big(e.net)} gemme/h
 function creditsCard(){
   return `<details class="card"><summary><h2>Crediti</h2></summary><div class="gsec">
     <p><b>Idle Obelisk Miner</b>: il gioco, il nome e tutte le immagini appartengono ai suoi sviluppatori. Questa è un'app non ufficiale fatta da giocatori, senza legami con loro.</p>
-    <p><b>Wiki di Idle Obelisk Miner</b> (shminer.miraheze.org) e chi la scrive: dati, formule, testi delle guide e immagini del gioco.</p>
+    <p><b><a href="https://shminer.miraheze.org" target="_blank" rel="noopener">Wiki di Idle Obelisk Miner</a></b> e chi la scrive: dati, formule, testi delle guide e immagini del gioco. I contenuti della wiki sono usati con licenza <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>: i testi delle guide sono stati adattati e tradotti, i dati riorganizzati per i calcoli. Gli autori di ogni pagina sono nella sua cronologia sulla wiki.</p>
     <p><b>Fogli da cui partono i calcoli</b>: «Idle Obelisk Miner — The Ultimate Gem Calculator» v2.2.24 di @Aizenmyo; «Let's Go Fishing» V2.0.6 di C.Rody, Metzli, Jake From Snake Farm, Frugal Leopard e Minnie1089. I conti sono stati rifatti e corretti con la wiki.</p>
     <p><b>Guide della community</b>: «IOM World 3 Checklist» di Frugal Leopard (dalla progressione di Bleak, con Eldormr, Maid, Dea e altri; foglio di Perp); «IOM Star Gain Checklist for Ob60 – Late World 3» v1.14 di ZanyT (grazie a Painezor, Bleak, Frugal); «Efishansy 2: The Arcanist's Cookbook» di Painezor; «Am I Ready for World 4?» di Hayez.</p>
     <p><b>Messaggi fissati del Discord ufficiale</b>, per fascia di Obelisco: Mel, Bleak, Tietah, Pond, DerSucher, buns, CoopaTroopaX, Hagi Daemon, hihi, minnie1089, Nanashi Ame, SweetMjango, Zenith, Vlaidberg, Volvary, ZanyT, Sakori e gli altri che li hanno scritti.</p>
+    <p><b>Licenza</b>: questa app è rilasciata con licenza <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>, gratuita e non commerciale. Non sono coperti: il nome e le immagini del gioco, che appartengono ai suoi sviluppatori, e i fogli, le guide e i messaggi Discord della community elencati sopra, che appartengono ai loro autori. Dettagli nel file LICENSE del <a href="https://github.com/bagaeraaps/obeliskcompass" target="_blank" rel="noopener">repository</a>.</p>
   </div></details>`;
 }
 /* ---- I tuoi dati: tutto quello che si compila a mano, in un posto solo ---- */
@@ -2319,7 +2321,7 @@ function vGuide(){
     <p class="gsrc">Fonte: fissati dei canali Discord per fascia di Obelisco.</p></div>`:""}
   <h2>Guide per argomento</h2>
   <div class="grid2 gtopics">${feat.map(t=>gTopic(t,r)).join("")}</div>
-  <p class="credits">Testi dalla wiki di Idle Obelisk Miner (shminer.miraheze.org) e dal materiale della community (World 3 Checklist, Star Gain Checklist di ZanyT, Efishansy, fissati Discord), calcolati sul tuo export.</p>
+  <p class="credits">Testi adattati dalla <a href="https://shminer.miraheze.org" target="_blank" rel="noopener">wiki di Idle Obelisk Miner</a> (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>) e dal materiale della community (World 3 Checklist, Star Gain Checklist di ZanyT, Efishansy, fissati Discord), calcolati sul tuo export.</p>
   </section>`;
 }
 function tryDrones(keys){

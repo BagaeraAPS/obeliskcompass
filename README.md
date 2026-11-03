@@ -28,7 +28,7 @@ Clearing the site's data deletes your accounts, and they don't follow you to ano
 ## Credits
 
 - **Idle Obelisk Miner**: the game, its name and all its images belong to its developers. This is an unofficial fan-made app with no ties to them.
-- **Idle Obelisk Miner Wiki** ([shminer.miraheze.org](https://shminer.miraheze.org)) and its editors: data, formulas, guide texts and game images.
+- **Idle Obelisk Miner Wiki** ([shminer.miraheze.org](https://shminer.miraheze.org)) and its editors: data, formulas, guide texts and game images. Wiki content is used under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/); the guide texts have been adapted and translated, and the data reorganised for the calculations. The authors of each page are listed in its history on the wiki.
 - **Spreadsheets the calculations start from**: «Idle Obelisk Miner — The Ultimate Gem Calculator» v2.2.24 by @Aizenmyo; «Let's Go Fishing» V2.0.6 by C.Rody, Metzli, Jake From Snake Farm, Frugal Leopard and Minnie1089. The math has been rebuilt and corrected against the wiki.
 - **Community guides**: «IOM World 3 Checklist» by Frugal Leopard (based on Bleak's sample progression, with Eldormr, Maid, Dea and others; spreadsheet by Perp); «IOM Star Gain Checklist for Ob60 – Late World 3» v1.14 by ZanyT (thanks to Painezor, Bleak, Frugal); «Efishansy 2: The Arcanist's Cookbook» by Painezor; «Am I Ready for World 4?» by Hayez.
 - **Pinned messages from the official Discord**, by Obelisk range: Mel, Bleak, Tietah, Pond, DerSucher, buns, CoopaTroopaX, Hagi Daemon, hihi, minnie1089, Nanashi Ame, SweetMjango, Zenith, Vlaidberg, Volvary, ZanyT, Sakori and everyone else who wrote them.
@@ -36,6 +36,10 @@ Clearing the site's data deletes your accounts, and they don't follow you to ano
 ## About the images
 
 The game images come from the wiki and belong to the game's developers. Permission to use them is being requested from the developers; they will be removed if the developers ask.
+
+## License
+
+This app is released under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/): free and non-commercial. Content taken from the Idle Obelisk Miner Wiki is used under the same license. Not covered: the game's name and images, which belong to its developers, and the community spreadsheets, guides and Discord messages credited above, which belong to their authors. See [LICENSE](LICENSE).
 
 ---
 
@@ -48,3 +52,5 @@ Una guida non ufficiale a **Idle Obelisk Miner**, calcolata sul tuo EXPORTSTATS:
 **Salvataggio.** Tutto resta nel tuo browser, non viene mandato da nessuna parte; pagina italiana e inglese condividono gli stessi account. Con **Salva backup** / **Carica backup** tieni una copia o la sposti su un altro dispositivo.
 
 **Crediti e immagini.** Vedi sopra: il gioco, il nome e le immagini appartengono ai suoi sviluppatori; i dati e le immagini vengono dalla wiki e dalla community. Stiamo chiedendo agli sviluppatori il permesso di usare le immagini; se lo chiedono, verranno tolte.
+
+**Licenza.** L'app è rilasciata con licenza [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), gratuita e non commerciale. I contenuti della wiki di Idle Obelisk Miner sono usati con la stessa licenza; i testi delle guide sono stati adattati e tradotti. Non sono coperti il nome e le immagini del gioco (degli sviluppatori) e il materiale della community (dei suoi autori). Vedi [LICENSE](LICENSE).

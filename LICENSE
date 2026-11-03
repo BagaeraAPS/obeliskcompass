@@ -1,0 +1,42 @@
+Obelisk Compass
+An unofficial, fan-made app for Idle Obelisk Miner.
+
+Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International License (CC BY-NC-SA 4.0).
+Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+Summary: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+You may share and adapt this work for non-commercial purposes, as long as you
+give appropriate credit, indicate if changes were made, and distribute your
+contributions under the same license.
+
+-------------------------------------------------------------------------------
+Material from the Idle Obelisk Miner Wiki
+-------------------------------------------------------------------------------
+
+This app uses content from the Idle Obelisk Miner Wiki
+(https://shminer.miraheze.org), written by its editors and licensed under
+CC BY-NC-SA 4.0. The authors of each page are listed in that page's history
+on the wiki.
+
+Changes made: the wiki's data and formulas were reorganised to run the
+calculations, and the guide texts were adapted, shortened and translated
+(Italian and English). The adapted material is released under the same
+license, CC BY-NC-SA 4.0.
+
+-------------------------------------------------------------------------------
+Not covered by this license
+-------------------------------------------------------------------------------
+
+- Idle Obelisk Miner, its name and all its images belong to its developers.
+  The game images in this app come from the wiki; they are not licensed by
+  this project and will be removed if the developers ask.
+- The community spreadsheets, guides and Discord messages credited in the
+  README belong to their authors and keep their own terms.
+
+-------------------------------------------------------------------------------
+No warranty
+-------------------------------------------------------------------------------
+
+This work is provided as is, without warranties of any kind. See sections 5
+and 6 of the license text.
