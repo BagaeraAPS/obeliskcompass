@@ -25,14 +25,6 @@ Everything stays **in your browser** (localStorage): nothing is sent anywhere. T
 
 Clearing the site's data deletes your accounts, and they don't follow you to another device. Use **Save backup** / **Load backup** (in the Account panel) to keep a copy or move it to another device.
 
-## Publishing it on GitHub Pages
-
-1. Create a public repository and upload `index.html`, `en.html` and `README.md`.
-2. Go to **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, then branch **main** and folder **/ (root)**, and click **Save**.
-3. After a minute or two the address appears at the top of that page (`https://<your-username>.github.io/<repository-name>/`).
-
-Each file is self-contained (code, data and images included), so there is nothing to build.
-
 ## Credits
 
 - **Idle Obelisk Miner**: the game, its name and all its images belong to its developers. This is an unofficial fan-made app with no ties to them.
