@@ -47,6 +47,4 @@ Una guida non ufficiale a **Idle Obelisk Miner**, calcolata sul tuo EXPORTSTATS:
 
 **Salvataggio.** Tutto resta nel tuo browser, non viene mandato da nessuna parte; pagina italiana e inglese condividono gli stessi account. Con **Salva backup** / **Carica backup** tieni una copia o la sposti su un altro dispositivo.
 
-**Pubblicarlo su GitHub Pages.** Carica `index.html`, `en.html` e `README.md` in un repository pubblico. In **Settings → Pages** scegli **Deploy from a branch**, branch **main**, cartella **/ (root)**, **Save**. Dopo un minuto o due l'indirizzo compare in cima alla pagina.
-
 **Crediti e immagini.** Vedi sopra: il gioco, il nome e le immagini appartengono ai suoi sviluppatori; i dati e le immagini vengono dalla wiki e dalla community. Stiamo chiedendo agli sviluppatori il permesso di usare le immagini; se lo chiedono, verranno tolte.
