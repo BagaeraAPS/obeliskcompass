@@ -3,10 +3,9 @@
 **English** · [Italiano](#italiano)
 
 An unofficial guide for **Idle Obelisk Miner**, calculated from your own EXPORTSTATS.
-Paste your export and it tells you what to do next, how many gems per hour you make and where they come from, which drones to run, and what to buy in Fishing.
+Paste your export and it tells you what to do next and where to do it in game: no extra numbers, just the next steps for your account.
 
-- **Guide**: what to do now, your next goal, milestones, guides by topic (Gems, Bombs, Drones, Fishing, Stars, Pets, Statues, Archaeology, Cards, Events, Divines, Arcanist). Every step says where to do it in game.
-- **Fishing**: what to buy now, docks, drone assignment, fish, cards and legendaries.
+- **Guide**: what to do now, your next goal, milestones, guides by topic (Gems, Bombs, Drones, Fishing and tributes, Stars, Pets, Statues, Archaeology, Cards, Events, Divines, Arcanist). Every step says where to do it in game, and each topic shows at a glance whether there's something to do.
 - **Your data**: the few things the export doesn't contain (bomb cards, rotation, Lootbug purchases…), plus all your export stats.
 
 Two languages, same data: `index.html` is Italian, `en.html` is English. The button in the header switches between them.
@@ -45,7 +44,7 @@ This app is released under [CC BY-NC-SA 4.0](https://creativecommons.org/license
 
 ## Italiano
 
-Una guida non ufficiale a **Idle Obelisk Miner**, calcolata sul tuo EXPORTSTATS: cosa fare adesso, quante gemme fai all'ora e da dove arrivano, quali droni usare, cosa comprare nella pesca.
+Una guida non ufficiale a **Idle Obelisk Miner**, calcolata sul tuo EXPORTSTATS: cosa fare adesso e dove farlo nel gioco, senza numeri in più, solo i prossimi passi per il tuo account.
 
 **Come si usa.** Nel gioco: **Options → Enter Code → `EXPORTSTATS`**, copia il testo. Sul sito tocca **Account**, incolla e tocca **Aggiungi come nuovo account**. Poi completa quello che chiede **I tuoi dati**; quando rigiochi, rifai l'export e tocca **Aggiorna**.
 

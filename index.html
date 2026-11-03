@@ -1375,7 +1375,7 @@ const Guides = (() => {
     { min: 62, max: 65, title: "Obelisk 62–65", items: [
       "Leggendari importanti: Rainbow Trout, Dune's Eelworm, Megalodon e Cthulhu. Dora presto le carte dei primi tre per i frammenti Poly.",
       "Cthulhu: punta a 6/87k (canna 56 e quest del Mr Nibbles a 9, cioè Angler grado 35). Porta la quest del Mr Nibbles a 8–10 il prima possibile.",
-      "Si stampa sushi solo mentre si farma un leggendario (vedi Pesca).",
+      "Si stampa sushi solo mentre si farma un leggendario (guida «Pesca e tributi»).",
       "Il percorso è quello della World 3 Checklist, fino alla checklist «Pronto per il World 4?»."] },
     { min: 66, max: 70, title: "Obelisk 66–70", items: [
       "Ascension dell'Archaeology: vai appena hai la carta Infernal T3 Legendary dell'Archaeology (vedi Archaeology).",
@@ -1477,7 +1477,7 @@ const Guides = (() => {
       gen: (to) => `Drones → Generator: si alza con le gemme (dal 22 al 30 in tutto 1,23 mln). Prima i Coal Upgrade, poi il carburante.${to ? "" : ""}`,
       mon: "Construct → Monument.",
       chal: "Menu Challenges: compra sempre l'upgrade più in basso della lista; se una è troppo dura passa ad altro e torna dopo.",
-      trib: "Fishing → Legendary → Tribute: chiede stelle, barre, vene, pesci e gemme (costi nella guida Pesca).",
+      trib: "Fishing → Legendary → Tribute: chiede stelle, barre, vene, pesci e gemme (il costo in gemme è nella guida «Pesca e tributi»).",
       infd: "Drones → Coal Upgrade «Infernal Cards» (servono generatore 30 e Talos a 560), poi tieni il drone equipaggiato e rifornito: diventa Infernal per caso, 10–20 giorni in media.",
     };
     let goal;
@@ -1490,10 +1490,10 @@ const Guides = (() => {
     else if (G.worlds === 3) goal = { title: "Pronto per il World 4", items: [
       it("Black Hole 14", G.bh >= 14, `livello ${G.bh}`, null, H.bh), it("Butterfly livello 5", G.petLv(14) >= 5, G.pet(14) ? `livello ${G.petLv(14)}` : "non comprato", null, "Pets: si compra con Black Hole 12 o con il Tributo 1 dello Storm Serpent, poi sale solo catturando Lootfrog (Frogger rifornito, skill Frog Frenzy 3/3, carta Lootfrog Polychrome)."),
       it("Generatore 30", gen === null ? null : gen >= 30, gen === null ? "" : `livello ${gen}`, gen === null ? "gen30" : null, H.gen()),
-      it("Carte Infernal dei primi 4 leggendari", first4Inf >= 4, `${first4Inf}/4`, null, "Fishing → Legendary: dopo il Tributo 2 del Laviathan ripesca Rainbow Trout, Dune's Eelworm, Glacial Shellstealer e Megalodon; ogni cattura dà un frammento Infernal (10 per carta). Si accelera stampando sushi (guida Pesca)."),
+      it("Carte Infernal dei primi 4 leggendari", first4Inf >= 4, `${first4Inf}/4`, null, "Fishing → Legendary: dopo il Tributo 2 del Laviathan ripesca Rainbow Trout, Dune's Eelworm, Glacial Shellstealer e Megalodon; ogni cattura dà un frammento Infernal (10 per carta). Si accelera stampando sushi (guida «Pesca e tributi»)."),
       it("9 tributi di livello 2", t2count >= 9, `${t2count}/9`, null, H.trib),
       it("1 mln di gemme e 10¹⁵ vene Industrial, Warfront e Neon", null, "", "w4cost", H.mon),
-      it("Enhance: Fish Multiplier 100, Poly Card Multi 12, resto al massimo", enhW4 <= 0, enhW4 > 0 ? `mancano ${G$(enhW4)}` : "", null, "Fishing → Enhance, con le gemme. Quali e quanto costano: guida Pesca."),
+      it("Enhance: Fish Multiplier 100, Poly Card Multi 12, resto al massimo", enhW4 <= 0, enhW4 > 0 ? `mancano ${G$(enhW4)}` : "", null, "Fishing → Enhance, con le gemme. Cosa comprare per primo: guida «Pesca e tributi»."),
       it("Pesci Infernal dei moli 1–6", fishInfT1 >= 24, `${fishInfT1}/24`, null, "Fishing: dopo il Tributo 2 del Laviathan i pesci dei moli 1–6 danno frammenti Infernal mentre peschi (10 per carta)."),
       it("Skill disponibili tutte", [...Array(64).keys()].every((i) => G.sk(i)) && G.sk(68), "", null, "Skill Tree: i Skill Point si comprano nello Store a 125 gemme, o si fanno con 10 Skill Bit del Freebie. Frog Yield: aspetta i frammenti naturali."),
       it("Golden Starfruit (Divine Challenge 10)", G.chal(36) >= 1, "", null, "Challenges → Divine Challenge 10: per un F2P 1–2 mesi, 10–14 giorni con i Value Pack degli Stonks."),
@@ -1634,7 +1634,7 @@ const Guides = (() => {
         todo.push("Codice LEFTOVERSUSHI. Prendi la carta Misc Fishing Rod spostando il pescatore fra due moli appena hai il secondo.");
         todo.push("Prima tutti gli upgrade del molo 1 e le carte dei pesci dorate man mano, almeno fino al 4° molo. Dora subito la carta Guppy: la sua Polychrome sblocca l'idolo Poseidon (+166% di potenza dei droni).");
         todo.push("Notice: compra solo quanto basta per sbloccare l'upgrade successivo, e consegna solo i pesci che non ti servono. Il Sushi conservalo per il Cthulhu e dora la carta Sushi appena esce.");
-        todo.push("Enhance a gemme: 100–800k in tutto prima del World 3; servono anche per togliere il −30% di game speed del World 3 con i Notice. L'ordine migliore è nella scheda Pesca.");
+        todo.push("Enhance a gemme: 100–800k in tutto prima del World 3; servono anche per togliere il −30% di game speed del World 3 con i Notice.");
       } else state.push(`Tributi di livello 2: ${t2count} su 11. Carte Infernal: ${fishInf} pesci su 44, ${legInf} leggendari su 11.`);
       for (let d = 0; d < 11 && !early; d++) {
         const v = G.trib(d), c = G.legCard(d), cn = ["", "base", "dorata", "Polychrome", "Infernal"][c] || "";
@@ -1652,11 +1652,21 @@ const Guides = (() => {
       else if (first4Inf < 4) sushi.push(`Prossima sessione, dopo il Tributo 2 del Laviathan: carte Infernal dei leggendari 1–4. Requisito: enhance sopra Triple Tick al massimo e Triple Tick a 10${above.length || G.enh(11) < 10 ? `; ti mancano ${[...above, ...(G.enh(11) < 10 ? [`Triple Tick ${G.enh(11)}/10`] : [])].join(", ")}` : ""}.`);
       else if (fishInfT1 < 24) sushi.push("Sessione attuale: pesci Infernal dei moli 1–6 e leggendari fino a Laviathan o Storm Serpent (Fish Multiplier 80, Poly 10, resto al massimo).");
       else sushi.push("Ultime sessioni: Infernal di Melting Gibbous e Blackened Basker e dei pesci dei moli T2.");
+      // cosa comprare adesso: classifica del motore della pesca (crescita dei pesci/ora sul molo più avanti, per gemma o per ora di pesca)
+      const buyG = F ? (F.gemRows || []).slice(0, 3) : [], buyF = F ? (F.rows || []).find((r) => r.kind === "upg" && r.rank === 1) : null;
+      if (buyG.length || buyF) {
+        const lab = (r) => r.kind === "skill" ? `skill ${r.name} ${r.lv + 1}/${r.max} (${N(r.costSP)} Skill Points)` : `${r.name} ${r.lv + 1} (${r.cost < 1e6 ? N(r.cost) : G$(r.cost)} gemme)`;
+        const parts = [];
+        if (buyG.length) parts.push(`con le gemme, in quest'ordine: ${buyG.map(lab).join(", poi ")}`);
+        if (buyF) parts.push(`con i pesci: ${buyF.name} ${buyF.lv + 1} (${G$(buyF.cost)} ${buyF.unit})`);
+        todo.unshift(`Da comprare adesso nella pesca, ${parts.join("; ")}. Calcolato sul molo più avanti che hai.`);
+      }
       if (!early) todo.push(sushi.join(" "));
       if (!early) todo.push(`Per pescare prima un leggendario, con la potenza del molo al massimo: Angler (grado ${G.grade("angler")}; più probabilità con la quest del Mr Nibbles, ora ${G.quest(12)}, e il Tributo 2 del molo 10), Tick Speed, sushi (Sushi Ticks+ e carta Sushi), meno tick richiesti (Tributo 1 del Cthulhu, Motley School, enhance Tier 2), tick extra (Elixir, Mr Nibbles, Black Hole 12, Pisces, carta Cthulhu) e tick dai Lootbug. Ora: riduzione tick ${N(num(S.fishing_tick_reduction_seconds))} s, Double Tick ${N(num(S.fishing_double_tick_chance))}%, Triple Tick ${N(num(S.fishing_triple_tick_chance))}%.`);
-      const fishB = early ? [{ k: "info", t: `moli ${Math.min(6, 1 + G.fishUpg(2))}/6` }, { k: "info", t: `enhance: ${G$(enhSpent)} gemme` }] : [{ k: "info", t: `tributi 2: ${t2count}/11` }];
+      const fishB = early ? [{ k: "info", t: `moli ${Math.min(6, 1 + G.fishUpg(2))}/6` }, { k: "info", t: `${G$(enhSpent)} gemme negli enhance` }] : [{ k: "info", t: `tributi 2: ${t2count}/11` }];
       if (!early && nextTrib) fishB.push({ k: "act", t: `prossimo: ${LEG[nextTrib[0]][0]} T${nextTrib[1]} · ${G$(LEG[nextTrib[0]][nextTrib[1]][1])}` });
       else if (!early) fishB.push({ k: "ok", t: "tributi fatti" });
+      if (buyG.length) fishB.push({ k: "act", t: `enhance: ${buyG[0].kind === "skill" ? buyG[0].name : `${buyG[0].name} ${buyG[0].lv + 1}`}` });
       T({ id: "pesca", title: "Pesca e tributi", badges: fishB, state, rows, todo, why: ["I tributi sbloccano i passi grandi (4° drone, Golden Gem Bomb, carte Infernal); gli enhance sono il modo di spendere le gemme che avanzano."], src: "Wiki Fishing; World 3 Checklist; «Am I Ready for World 4?»; guida alla stampa del sushi (ob62-63)", tab: "pesca" });
     }
     // ---- Stelle e Black Hole
@@ -1824,7 +1834,7 @@ function mergeSet(saved){
   }
   return s;
 }
-const state = { P: null, R: null, set: mergeSet(null), tab: ({impostazioni:"profilo",manuali:"dati",bug:"note"})[LS.get("ogl.tab")] || LS.get("ogl.tab") || "guide", err: null };
+const state = { P: null, R: null, set: mergeSet(null), tab: ({impostazioni:"profilo",manuali:"dati",bug:"note",pesca:"guide"})[LS.get("ogl.tab")] || LS.get("ogl.tab") || "guide", err: null };
 const jparse = (t, d) => { try { return JSON.parse(t) } catch (e) { return d } };
 
 /* ---------- account: salvati nel database privato dell'artefatto (data/users/<id>/), copia locale nel browser ---------- */
@@ -1936,7 +1946,7 @@ function recompute(){
 }
 
 /* ---------- viste ---------- */
-const TABS = [["guide","Guida"],["pesca","Pesca"],["dati","I tuoi dati"]];
+const TABS = [["guide","Guida"],["dati","I tuoi dati"]];
 function visibleTabs(){
   const R=state.R, P=state.P, s=state.set;
   return TABS.filter(([id])=> id==="pesca" ? !!(P&&P.ob>=37) : true);
@@ -2298,7 +2308,6 @@ function vGuide(){
   const feat=r.topics.filter(t=>t.featured!==false);
   const goto=(tab)=>tab&&visibleTabs().some(([id])=>id===tab)?`<button class="linkbtn" type="button" data-goto="${tab}">Apri ${esc((TABS.find(y=>y[0]===tab)||["",""])[1])}</button>`:"";
   return `<section class="panel">
-  ${incomeBox(R)}
   ${droneBox()}
   ${exportAgeCard()}
   ${todo.length?`<div class="card attn"><span class="label">Da completare</span><p>${todo.map(esc).join(", ")}: cambiano i conti.</p><button class="btn primary" type="button" data-goto="dati">Apri I tuoi dati</button></div>`:""}
