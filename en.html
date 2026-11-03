@@ -245,6 +245,7 @@ details.gph[open]>summary{margin-bottom:8px}
 .gchecks{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px}
 .glist{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:4px}
 .gtopic>summary{cursor:pointer}
+.gtopic>summary{flex-wrap:wrap;row-gap:6px} .gtopic>summary::after{order:1} .gtopic .gbadges{order:2;flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px} .gtopic .gbadges .pill{white-space:normal;font-size:.74rem}
 .gtopics{grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))} .gtopics>details{min-width:0;max-width:100%} .gtopics .card *{overflow-wrap:anywhere}
 .gtopic .gsteps .val{white-space:normal;text-align:right} .gtopic .gsteps li>span{min-width:0}
 .dchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
@@ -1214,7 +1215,7 @@ Fishing.setCosts({"rod":[[10,0],[12,0],[15,1],[18,1],[22,2],[28,2],[34,3],[42,3]
 const Guides = (() => {
   "use strict";
   const num = (v, d = 0) => (typeof v === "number" && isFinite(v) ? v : d);
-  const N = (n, d = 0) => num(n).toLocaleString("en-US", { maximumFractionDigits: d });
+  const N = (n, d = 0) => num(n).toLocaleString("en-US", { maximumFractionDigits: d, useGrouping: "always" });
   const G$ = (n) => { n = num(n); const a = Math.abs(n), f = (x) => x.toLocaleString("en-US", { maximumFractionDigits: 2 });
     return a >= 1e15 ? n.toExponential(2).replace("e+", "e") : a >= 1e12 ? `${f(n / 1e12)}t` : a >= 1e9 ? `${f(n / 1e9)}b` : a >= 1e6 ? `${f(n / 1e6)}m` : a >= 1e4 ? `${Math.round(n / 1e3).toLocaleString("en-US")}k` : N(n); };
   const safe = (f, d = null) => { try { return f() } catch (e) { return d } };
@@ -1565,10 +1566,12 @@ const Guides = (() => {
       const must = [["bomb10x", "10x Bomb Recharge"], ["relic", "Relic Chests"], ["arch", "Archaeology seconds"], ["fishOrCherry", "Fishing Ticks"]];
       const opt = [["ore", "2x Ore"], ["vein", "3x Vein"], ["star", "2x Star Spawn"], ["gs", "2x Game Speed"], ["itemChests", "Item Chests"]];
       const buy = set.buy || {};
+      let missN = 0;
+      if (P.ob < 37) { if (!buy.bomb10x) missN = 1; }
       if (P.ob < 37) todo.push(`From Lootbugs, buy 10x Bomb Recharge (it gives more gems than it costs)${buy.bomb10x ? ", which you already buy," : ""} and 2x Game Speed: Freebies pay it back. The rest waits until the Plat Strat is done.`);
       else {
         const fishOk = enhSpent >= 25000;
-        const missMust = must.filter(([k]) => !buy[k] && !(k === "fishOrCherry" && !fishOk));
+        const missMust = must.filter(([k]) => !buy[k] && !(k === "fishOrCherry" && !fishOk)); missN = missMust.length;
         todo.push(missMust.length ? `From Lootbugs, always buy: ${missMust.map((x) => x[1]).join(", ")} (time-gated).` : `You already buy the always-buy items from Lootbugs (10x, Relic Chests, Archaeology seconds${fishOk ? ", Fishing Ticks" : ""}).`);
         if (!fishOk) todo.push("Fishing Ticks from Lootbugs only after investing 25–50k gems into Fishing Enhance.");
       }
@@ -1580,7 +1583,12 @@ const Guides = (() => {
       if (G.trib(6) < 3 && G.trib(6) >= 2 && R && R.bombs) { const gb = (R.sources.find((s) => s.id === "bombs") || {}).gems || 0; const gain = gb * 0.25; if (gain > 0) todo.push({ small: true, t: `Golden Gem Bomb (Glimmering Geoduck Tribute 2): about +${N(gain)} gems/h, it pays back in ${N(1.1e6 / gain / 24, 0)} days.` }); }
       let gsg = gemGuide(G, set, gen, enhSpent);
       if (gsg && gsg.rows.every((x) => x.ok === true)) { state.push(`Wiki gem spending order for ${gsg.title}: all done.`); gsg = null; }
-      T({ id: "gemme", title: "Gems", state, todo, rows: gsg ? gsg.rows : null, rowsTitle: gsg ? `Wiki gem spending order (${gsg.title})` : null, why: ["Time-gated items (relics, Archaeology, fishing) can't be caught up later: that's why the Discord treats them as must-buys."], src: "App engine; Lootbug pin (Discord); wiki Obelisk" });
+      const gsgN = gsg ? gsg.rows.filter((x) => x.ok === false).length : 0;
+      const gemB = [{ k: "info", t: `${N(gemsH)} gems/h` }];
+      if (missN) gemB.push({ k: "act", t: `Lootbug: ${missN} to buy` });
+      if (gsgN) gemB.push({ k: "act", t: `${gsgN} ${gsgN === 1 ? "wiki purchase" : "wiki purchases"} to do` });
+      if (!missN && !gsgN) gemB.push({ k: "ok", t: "purchases OK" });
+      T({ id: "gemme", title: "Gems", badges: gemB, state, todo, rows: gsg ? gsg.rows : null, rowsTitle: gsg ? `Wiki gem spending order (${gsg.title})` : null, why: ["Time-gated items (relics, Archaeology, fishing) can't be caught up later: that's why the Discord treats them as must-buys."], src: "App engine; Lootbug pin (Discord); wiki Obelisk" });
     }
     // ---- Bombe
     {
@@ -1590,7 +1598,11 @@ const Guides = (() => {
       if (G.bombCap < 100000) todo.push("Under 100k capacity: use Cherry charges on Battery to grow your cap. Loop when you come back from idle: fire all Battery bombs on the Cherry charges; then Gem and Infinity; then cycle D20 → Cherry → Battery until no more refills; then Gem and Infinity again; put Cherry back on auto.");
       else if (!(G.sk(60) && G.statue(3, 3) >= 1)) todo.push(`Switching to D20 needs the Obelisk Mincer skill${G.sk(60) ? " (done)" : ""} and the World 4 Statue of Nature${G.statue(3, 3) >= 1 ? " (done)" : ""}, plus the Workshop upgrades for Free Bomb Chance, Triple Cherry Chance and D20 Charges.`);
       todo.push("When you're not farming, autobomb Cherry (it uses the 3x) and spend the charges on your rotation bomb. For ores Bomb of Plenty, for veins Veinmorpher.");
-      T({ id: "bombe", title: "Bombs", state, todo, why: ["Bomb Capacity drives everything early on; past 100k gems become the bottleneck and Gem Bomb your main source."], src: "Wiki Cherry Bomb Guide and FAQ; ZanyT's pin (ob0-23)", tab: "bombe" });
+      const bombB = [{ k: "info", t: `cap ${G$(G.bombCap)}` }];
+      if (G.bombCap < 100000) bombB.push({ k: "act", t: "Cherry on Battery" });
+      if (rv && rv.best && rv.best[1] - rv.current > 0.5) bombB.push({ k: "act", t: `switch to ${rv.best[0] === "gem" ? "Gem" : rv.best[0] === "d20" ? "D20" : "Battery"}: +${N(rv.best[1] - rv.current)}/h` });
+      else if (rv && rv.vals) bombB.push({ k: "ok", t: "best rotation" });
+      T({ id: "bombe", title: "Bombs", badges: bombB, state, todo, why: ["Bomb Capacity drives everything early on; past 100k gems become the bottleneck and Gem Bomb your main source."], src: "Wiki Cherry Bomb Guide and FAQ; ZanyT's pin (ob0-23)", tab: "bombe" });
     }
     // ---- Droni
     {
@@ -1605,7 +1617,12 @@ const Guides = (() => {
       const capList = P.drones.filter((d) => d.owned && d.unlock <= P.ob && DRONE_CAP[d.key]).map((d) => { const c = capSources(G, d.key); return `${d.name} (Grade ${d.grade}, game max ${c.max}): ${capTxt(G, d.key)}`; });
       if (capList.length) todo.push({ t: "Where the grade cap comes from (✓ you have it, ○ missing, ? not in the export). If a drone is stuck, its cap has to go up:", plain: capList });
       if (G.worlds >= 3 && P.ob >= 60) todo.push({ check: [["infElixir", "Infernal Elixir"], ["infStarburst", "Infernal Starburst"], ["infMidas", "Infernal Midas"], ["infBear", "Infernal Bear"], ["infFrogger", "Infernal Frogger"], ["infAngler", "Infernal Angler"]], t: "Infernal drones: a drone turns Infernal at random while equipped and fueled (10–20 days on average). Once one is done, replace it with one you still need." });
-      T({ id: "droni", title: "Drones", state, rows, todo, why: ["Setups are calculated by the app engine on your numbers: the gain is in gems/h compared to now; the rest is what the setup farms."], src: "App engine; World 3 Checklist; ob51-61 channel", tab: "droni", input: P.ob >= 40 && G.worlds <= 3 ? "gen" : null });
+      const droneB = [{ k: cur.length > slots ? "bad" : "info", t: `${cur.length}/${slots} slots` }];
+      const bestSet = setups.filter((x) => !x.same).sort((a, b) => b.gain - a.gain)[0];
+      if (bestSet && bestSet.gain > 50) droneB.push({ k: "act", t: `best setup: +${N(bestSet.gain)}/h` });
+      if (owned("prism") && G.worlds < 4 && cur.includes("prism")) droneB.push({ k: "act", t: "remove the Prism" });
+      if (droneB.length === 1) droneB.push({ k: "ok", t: "setup OK" });
+      T({ id: "droni", title: "Drones", badges: droneB, state, rows, todo, why: ["Setups are calculated by the app engine on your numbers: the gain is in gems/h compared to now; the rest is what the setup farms."], src: "App engine; World 3 Checklist; ob51-61 channel", tab: "droni", input: P.ob >= 40 && G.worlds <= 3 ? "gen" : null });
     }
     // ---- Pesca
     if (P.ob >= 37) {
@@ -1636,7 +1653,10 @@ const Guides = (() => {
       else sushi.push("Last sessions: Infernal Melting Gibbous and Blackened Basker and the T2 dock fish.");
       if (!early) todo.push(sushi.join(" "));
       if (!early) todo.push(`To catch a legendary faster, with the dock power already maxed: Angler (Grade ${G.grade("angler")}; higher chance with the Mr Nibbles quest, now ${G.quest(12)}, and the Dock 10 Tribute 2), Tick Speed, sushi (Sushi Ticks+ and the Sushi card), lower tick requirements (Cthulhu Tribute 1, Motley School, Tier 2 enhance), extra ticks (Elixir, Mr Nibbles, Black Hole 12, Pisces, Cthulhu card) and ticks from Lootbugs. Now: tick reduction ${N(num(S.fishing_tick_reduction_seconds))} s, Double Tick ${N(num(S.fishing_double_tick_chance))}%, Triple Tick ${N(num(S.fishing_triple_tick_chance))}%.`);
-      T({ id: "pesca", title: "Fishing and tributes", state, rows, todo, why: ["Tributes unlock the big steps (4th drone, Golden Gem Bomb, Infernal cards); Enhance is where your spare gems go."], src: "Wiki Fishing; World 3 Checklist; «Am I Ready for World 4?»; sushi printing guide (ob62-63)", tab: "pesca" });
+      const fishB = early ? [{ k: "info", t: `docks ${Math.min(6, 1 + G.fishUpg(2))}/6` }, { k: "info", t: `enhance: ${G$(enhSpent)} gems` }] : [{ k: "info", t: `T2 tributes: ${t2count}/11` }];
+      if (!early && nextTrib) fishB.push({ k: "act", t: `next: ${LEG[nextTrib[0]][0]} T${nextTrib[1]} · ${G$(LEG[nextTrib[0]][nextTrib[1]][1])}` });
+      else if (!early) fishB.push({ k: "ok", t: "tributes done" });
+      T({ id: "pesca", title: "Fishing and tributes", badges: fishB, state, rows, todo, why: ["Tributes unlock the big steps (4th drone, Golden Gem Bomb, Infernal cards); Enhance is where your spare gems go."], src: "Wiki Fishing; World 3 Checklist; «Am I Ready for World 4?»; sushi printing guide (ob62-63)", tab: "pesca" });
     }
     // ---- Stelle e Black Hole
     if (P.ob >= 23) {
@@ -1651,7 +1671,11 @@ const Guides = (() => {
       if (!G.sk(53) || !G.sk(54)) todo.push("Infernal Stars and Veins (Astral Forge and Flaming Veins skills) once you make 200–300m stars per hour with Starfruit and Starburst and 1t Neon Veins per hour.");
       const SN = [[2, "Gemini"], [1, "Taurus"], [5, "Virgo"], [7, "Scorpio"], [8, "Sagittarius"], [11, "Pisces"]];
       state.push(`Levels: ${SN.map(([i, n]) => `${n} ${G.star(i)}`).join(", ")}.`);
-      T({ id: "stelle", title: G.worlds >= 3 ? "Stars and Black Hole" : "Stars", state, rows, todo, why: ["Black Hole levels cost veins and stars (one early star, Aries–Pisces, and one late star, Ophiuchus–Cetus)."], src: "Wiki Stargazing; IOM Star Gain Checklist (ZanyT); ob30-36 and ob51-61 channels", input: "fpm" });
+      const starB = [];
+      if (G.worlds >= 3) starB.push({ k: G.bh >= 30 ? "ok" : "info", t: `Black Hole ${G.bh}` });
+      if (starX > 1.05) starB.push({ k: "act", t: `star setup: ×${N(starX, 1)}` });
+      else starB.push({ k: "info", t: `${G$(stNow.starH)} stars/h` });
+      T({ id: "stelle", title: G.worlds >= 3 ? "Stars and Black Hole" : "Stars", badges: starB, state, rows, todo, why: ["Black Hole levels cost veins and stars (one early star, Aries–Pisces, and one late star, Ophiuchus–Cetus)."], src: "Wiki Stargazing; IOM Star Gain Checklist (ZanyT); ob30-36 and ob51-61 channels", input: "fpm" });
     }
     // ---- Pet
     if (P.ob >= 17) {
@@ -1663,7 +1687,12 @@ const Guides = (() => {
       const noSkin = PET.map((n, i) => [n, i]).filter(([, i]) => G.pet(i) && !G.skin(i)).map(([n]) => n), noQS = PET.map((n, i) => [n, i]).filter(([, i]) => G.pet(i) && !G.questSkin(i)).map(([n]) => n);
       if (noSkin.length || noQS.length) todo.push(`Missing skins: ${noSkin.join(", ") || "none"}; missing quest skins: ${noQS.join(", ") || "none"}.`);
       if (G.skin(14) || P.ob >= 62) todo.push({ t: "Infernal Pets (after the Butterfly skin). Farmable: Dwarf (prestige on floor 43 after buying all pickaxe levels), Rabbit (floor 42, lots of contracts), Happy-Bot (spam prestige), Axolotl (while farming Infernal ores and bars), Mr Nibbles (100% on fish), Crab (max-stack Basic Bombs), Nagini (Golden Ore with Lasagna and Bomb of Plenty). Possible before W4: Starfish (super stars), Whale (spending gems), Butterfly (frogs). From veins: Totem, Dino, Duck. Pure RNG: Leprechaun (rainbow floors, Lollipop), Penguin (golden floors).", check: PET.map((n, i) => ["infPet" + i, n]) });
-      T({ id: "pet", title: "Pet", state, todo, why: ["Infernal Pets are ticked by hand: the export doesn't say which Infernal cards you have."], src: "Wiki Pets; World 3 Checklist; «Am I Ready for World 4?»" });
+      const petB = [{ k: "info", t: `${G.petSum} levels` }];
+      if (G.pet(14) && G.petLv(14) < 5) petB.push({ k: "act", t: `Butterfly ${G.petLv(14)}/5` });
+      if (lowQ.length) petB.push({ k: "act", t: `${lowQ.length} quests below 10` });
+      if (noSkin.length + noQS.length) { const ns = noSkin.length + noQS.length; petB.push({ k: "act", t: `${ns} ${ns === 1 ? "missing skin" : "missing skins"}` }); }
+      if (petB.length === 1) petB.push({ k: "ok", t: "quests and skins done" });
+      T({ id: "pet", title: "Pets", badges: petB.slice(0, 3), state, todo, why: ["Infernal Pets are ticked by hand: the export doesn't say which Infernal cards you have."], src: "Wiki Pets; World 3 Checklist; «Am I Ready for World 4?»" });
     }
     // ---- Statue e monumenti
     {
@@ -1672,7 +1701,12 @@ const Guides = (() => {
       if (G.worlds >= 4) state.push(`World 4: ${G.statues(3, 1)}/9 built, ${G.statues(3, 2)} gilded (W4 statues can't be platinized).`);
       const todo = [];
       if (G.worlds === 3) todo.push("World 4 starts with −80% game speed, which World Quests reduce. Black Hole 14 may allow one statue, but you'll need 16 soon. Unlock it once you meet the in-game recommendations.");
-      T({ id: "statue", title: "Statues and monuments", state, todo, why: [], src: "Wiki Construct; «Am I Ready for World 4?»" });
+      const statB = [];
+      const stStep = (w, lab, plat) => { const b = G.statues(w, 1), g = G.statues(w, 2), p = G.statues(w, 3);
+        if (b < 9) return `${lab}: ${9 - b} to build`; if (g < 9) return `${lab}: ${9 - g} to gild`; if (plat && p < 9) return `${lab}: ${9 - p} to platinize`; return null; };
+      [[1, "W1", P.ob >= 37], [2, "W3", true], [3, "W4", false]].filter(([w]) => G.worlds >= (w === 1 ? 1 : w + 1)).forEach(([w, lab, plat]) => { const x = stStep(w, lab, plat); if (x) statB.push({ k: "act", t: x }); });
+      if (!statB.length) statB.push({ k: "ok", t: "all done" });
+      T({ id: "statue", title: "Statues and monuments", badges: statB, state, todo, why: [], src: "Wiki Construct; «Am I Ready for World 4?»" });
     }
     // ---- Archaeology
     if (P.ob >= 30) {
@@ -1683,34 +1717,43 @@ const Guides = (() => {
       todo.push("Gems: Block Bonker skill, gilded cards, gem upgrades (Fragments 20,782, Stamina 39,305, Experience 17,208), Avada Keda-' skill.");
       if (P.ob >= 62 && G.idol(24) === 0) todo.push("Ascension: go as soon as you have the T3 Legendary Archaeology Infernal card; Hestia: as many as you have; ignore Dino in Ascension 1 (it's easier in Ascension 2). Requirements: Obelisk 66, level 90 and stage 115 (Ascension 2: level 100 and stage 150).");
       if (P.ob >= 66) todo.push("Ascension 1: start with Divinity, after the 2/5 Strength upgrade switch to Strength, from level 60–70 go back to Divinity. Every 2 levels push with max Luck (Agility below level 50); fragments: max Luck, Divinity and Perception, the rest in Strength. Ascension 2: same progression, Corruption in the fragment build; aim for stage +100, preferably +150, no further. Don't max Gleaming Floor Multi, Loot Mod Gain, Super Crit Damage and Maximum Stamina: 15 is enough.");
-      T({ id: "arch", title: "Archaeology", state, todo, why: ["Idols stay after Ascension: that's why you should ascend early, as soon as the T3 Legendary card saves you upgrades."], src: "Wiki Archaeology; ob30-36, ob42-50 channels; Ascension guide (ob66, after patch 2.2)", input: "arch" });
+      const archB = [{ k: "info", t: `Ascension ${gs.asc !== undefined && gs.asc !== null && gs.asc !== "" ? gs.asc : asc}` }];
+      if (gs.stage) archB.push({ k: "info", t: `stage ${gs.stage}` });
+      if (P.ob >= 66 && G.idol(24) === 0) archB.push({ k: "act", t: "Ascension 1 to do" });
+      T({ id: "arch", title: "Archaeology", badges: archB, state, todo, why: ["Idols stay after Ascension: that's why you should ascend early, as soon as the T3 Legendary card saves you upgrades."], src: "Wiki Archaeology; ob30-36, ob42-50 channels; Ascension guide (ob66, after patch 2.2)", input: "arch" });
     }
     // ---- Carte e Infernal
     if (P.ob >= 15) {
-      const sets = [["Veins", G.sk(53), "skill Flaming Veins"], ["Stars", G.sk(54), "skill Astral Forge"], ["Ores and Bars", G.trib(7) >= 2, "Laviathan Tribute 1"], ["Fish and Legendary Fish", G.trib(7) >= 3, "Laviathan Tribute 2"], ["Pet", G.skin(14), "Butterfly skin"], ["Misc", G.idol(24) > 0 ? null : false, "Hestia Idol (after Ascension 1)"], ["Archaeology", null, "Hades Idol"], ["Drones", null, "Coal Upgrade «Infernal Cards» (Generator 30, Talos 560)"]];
+      const sets = [["Veins", G.sk(53), "skill Flaming Veins"], ["Stars", G.sk(54), "skill Astral Forge"], ["Ores and Bars", G.trib(7) >= 2, "Laviathan Tribute 1"], ["Fish and Legendary Fish", G.trib(7) >= 3, "Laviathan Tribute 2"], ["Pets", G.skin(14), "Butterfly skin"], ["Misc", G.idol(24) > 0 ? null : false, "Hestia Idol (after Ascension 1)"], ["Archaeology", null, "Hades Idol"], ["Drones", null, "Coal Upgrade «Infernal Cards» (Generator 30, Talos 560)"]];
       const rows = sets.map(([n, ok, how]) => ({ t: n, ok: ok === null ? null : !!ok, val: ok ? "unlocked" : ok === null ? `${how}: not in the export` : `needs: ${how}` }));
       const c = set.cards || {}, CN = ["—", "base", "gilded", "Polychrome", "Infernal"];
       const state = [`Bomb cards: Gem ${CN[num(c.gem)]}, Cherry ${CN[num(c.cherry)]}, Battery ${CN[num(c.battery)]}, D20 ${CN[num(c.d20)]}.`];
       const todo = ["The rule: Poly shards only drop if the card is gilded (and you have the Polychrome skill); Infernal needs the Poly and the set unlocked. Even a card that looks useless should go to Poly for the Polychrome Power skill."];
       if (P.ob >= 62) todo.push({ t: `Infernal Misc Cards. Obtained like the normal card: ${MISC_SAME.join(", ")}. With their own method:`, list: MISC_DIFF.map(([k, n, how]) => ({ k: "misc_" + k, t: n, how })) });
-      T({ id: "carte", title: P.ob >= 60 ? "Cards and Infernals" : "Cards", state, rows: P.ob >= 60 ? rows : null, todo, why: [], src: "Wiki Cards; FAQ; ob66 channel pin (Discord)", tab: "dati" });
+      const cardB = [];
+      const bombLv = [c.gem, c.cherry, c.battery, c.d20].map(num);
+      if (bombLv.every((x) => !x)) cardB.push({ k: "act", t: "bomb cards to enter" });
+      else if (bombLv.some((x) => x < 2)) { const nb = bombLv.filter((x) => x < 2).length; cardB.push({ k: "act", t: `${nb === 1 ? "1 bomb card" : `${nb} bomb cards`} to gild` }); }
+      if (P.ob >= 60) { const known = rows.filter((r) => r.ok !== null); cardB.push({ k: known.every((r) => r.ok) ? "ok" : "info", t: `Infernal sets: ${known.filter((r) => r.ok).length}/${known.length}` }); }
+      if (!cardB.length) cardB.push({ k: "ok", t: "bomb cards gilded" });
+      T({ id: "carte", title: P.ob >= 60 ? "Cards and Infernals" : "Cards", badges: cardB, state, rows: P.ob >= 60 ? rows : null, todo, why: [], src: "Wiki Cards; FAQ; ob66 channel pin (Discord)", tab: "dati" });
     }
     // ---- Eventi
     {
       const mon = Math.pow(2, Math.max(0, G.worlds - 1));
       const state = [nextEvent(), `Guaranteed rewards ×${mon} for your monuments: ${N(655 * mon)} gems, ${N(72 * mon)} Skill Bits, ${N(65 * mon)} Relic Chests (Gifts, Mythic Chests and skins excluded).`];
       const todo = ["Gems: 1,225 at the start (event speed, 2x currencies, 3 × +10% health); if you can't, 2x currencies first (500).", "Prestige at waves 10, 20, 30, 55, then after 105 and 205. Damage that's enough: 144 at wave 20, 214 at 30, 389 at 55, 704 at 100; beyond that, health and attack speed.", "Rewards double for every monument: it just has to be built before you claim them."];
-      T({ id: "eventi", title: "Events", state, todo, why: [], src: "Wiki Events Guide" });
+      T({ id: "eventi", title: "Events", badges: [eventBadge()], state, todo, why: [], src: "Wiki Events Guide" });
     }
     // ---- Divine
     if (G.worlds >= 2) {
       const tot = DIVINE.reduce((s, [i]) => s + G.relic(i), 0);
       const state = [`${N(tot)} Divines: ${DIVINE.map(([i, n]) => `${n} ${N(G.relic(i))}`).join(", ")}.`];
       const todo = ["Base chance 1 in 25,000. With 100–200k chests and enough gems, reroll (200 gems) regularly: 1 in 12–15k is a good average.", "Past 10 Divines, reroll for a better distribution: cap Supernova Multipliers when farming stars, Rainbow Floor Multi when grinding ores and bars. Only Rainbow Floor Chance is uncapped: keep it low, except when grinding bars."];
-      T({ id: "divine", title: "Divines and relics", state, todo, why: [], src: "Wiki Relics and FAQ" });
+      T({ id: "divine", title: "Divines and relics", badges: [{ k: "info", t: `${N(tot)} Divines` }], state, todo, why: [], src: "Wiki Relics and FAQ" });
     }
     // ---- Arcanist
-    if (P.ob >= 66) T({ id: "arcanist", title: "Arcanist", featured: P.ob >= 71, state: [P.ob >= 71 ? "The export has no Arcanist data: this guide is the same for everyone." : "Unlocks at Obelisk 71."], todo: [
+    if (P.ob >= 66) T({ id: "arcanist", title: "Arcanist", badges: [{ k: "info", t: P.ob >= 71 ? "general guide" : "from Obelisk 71" }], featured: P.ob >= 71, state: [P.ob >= 71 ? "The export has no Arcanist data: this guide is the same for everyone." : "Unlocks at Obelisk 71."], todo: [
       "Four tabs. Essence: fight essence mines (Brittle spawns with 20% health, Shiny adds +3 to min and max loot). Altar: converts essence into runes; the first altar starts paused. Spells: runes and mana to cast spells, each with a passive effect that's always on and an active effect while cast; they level up as you cast them. Exchange: trade almost any resource for orbs, the currency for upgrades.",
       "Orbs: damage and max loot; buy max loot when it costs about twice a damage upgrade. Altar: capacity first, only until you consume more essence than you produce; then Rune Craft Multi. The most important Wizard upgrade is Exchange Timer Reduction (from 2 hours to 1).",
       "Runes: save them to unlock the next essence or altar (the first four altars ask for Soft, Soft, Dense, Dense).",
@@ -1729,6 +1772,13 @@ const Guides = (() => {
     if (curE) return `The event running now is ${curE[1]}, until the end of the month.`;
     const nx = EVENTS.find(([em]) => em > m) || EVENTS[0];
     return `Next event: ${nx[1]}, starting ${MESI[nx[0] - 1]} 1, for a month.`;
+  }
+
+  function eventBadge(now = new Date()) {
+    const m = now.getMonth() + 1, curE = EVENTS.find(([em]) => em === m);
+    if (curE) return { k: "act", t: `${curE[1]} is on` };
+    const nx = EVENTS.find(([em]) => em > m) || EVENTS[0];
+    return { k: "info", t: `${nx[1]} starts ${MESI[nx[0] - 1]} 1` };
   }
 
   return { evaluate, stars, nextEvent, BANDS, LEG, TRIB_ORDER, PET };
@@ -2052,7 +2102,7 @@ function setDrone(key, field, value){
 function vProfilo(){
   const P=state.P, f=P.flags, R=state.R, bk=P.banked, fl=Math.round(+P.S.current_floor||0);
   const world=fl>=105?4:fl>=73?3:fl>=43?2:1;
-  const fl2=[["Cards",f.cards],["Pet",f.pets],["Drone fuel",f.fuel],["Construct",f.construct],["Stone Vein Research",f.stoneVein],["Stargazing",f.stargazing],["Telescope",f.telescope],["Auto-catch above 75%",f.auto75],["Archaeology",f.arch],["Fishing",f.fish],["Prism",f.prism],["Arcanist",f.arcane]];
+  const fl2=[["Cards",f.cards],["Pets",f.pets],["Drone fuel",f.fuel],["Construct",f.construct],["Stone Vein Research",f.stoneVein],["Stargazing",f.stargazing],["Telescope",f.telescope],["Auto-catch above 75%",f.auto75],["Archaeology",f.arch],["Fishing",f.fish],["Prism",f.prism],["Arcanist",f.arcane]];
   const keys=Object.keys(P.S).sort();
   return `<section class="panel"><div class="grid2">
   <div class="card"><h2>Game speed</h2><dl class="kv">
@@ -2210,7 +2260,9 @@ function gExtra(t, r){
   return "";
 }
 function gTopic(t, r){
-  return `<details class="card gtopic" ${t.open?"open":""}><summary><h2>${esc(t.title)}</h2></summary>
+  const B={act:"todo",ok:"fix",info:"check",bad:"you"};
+  const badges=(t.badges||[]).map(b=>`<span class="pill ${B[b.k]||"check"}">${b.k==="ok"?"✓ ":b.k==="act"?"● ":""}${esc(b.t)}</span>`).join("");
+  return `<details class="card gtopic" ${t.open?"open":""}><summary><h2>${esc(t.title)}</h2>${badges?`<span class="gbadges">${badges}</span>`:""}</summary>
     ${t.state&&t.state.length?`<div class="gsec"><h3>Where you are</h3>${t.state.map(x=>`<p>${esc(x)}</p>`).join("")}</div>`:""}
     ${t.rowsTitle?`<h3 class="grt">${esc(t.rowsTitle)}</h3>`:""}${t.rows&&t.rows.length&&t.id!=="droni"?`<ol class="gsteps">${t.rows.map(x=>gItem({t:x.t,ok:x.ok===undefined?null:x.ok,val:x.val})).join("").replace(/<li class="g-man"><span class="ic"[^>]*>–<\/span>/g,'<li class="g-plain"><span class="ic">·</span>')}</ol>`:""}
     ${gExtra(t, r)}

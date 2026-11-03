@@ -245,6 +245,7 @@ details.gph[open]>summary{margin-bottom:8px}
 .gchecks{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px}
 .glist{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:4px}
 .gtopic>summary{cursor:pointer}
+.gtopic>summary{flex-wrap:wrap;row-gap:6px} .gtopic>summary::after{order:1} .gtopic .gbadges{order:2;flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px} .gtopic .gbadges .pill{white-space:normal;font-size:.74rem}
 .gtopics{grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))} .gtopics>details{min-width:0;max-width:100%} .gtopics .card *{overflow-wrap:anywhere}
 .gtopic .gsteps .val{white-space:normal;text-align:right} .gtopic .gsteps li>span{min-width:0}
 .dchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
@@ -1214,7 +1215,7 @@ Fishing.setCosts({"rod":[[10,0],[12,0],[15,1],[18,1],[22,2],[28,2],[34,3],[42,3]
 const Guides = (() => {
   "use strict";
   const num = (v, d = 0) => (typeof v === "number" && isFinite(v) ? v : d);
-  const N = (n, d = 0) => num(n).toLocaleString("it-IT", { maximumFractionDigits: d });
+  const N = (n, d = 0) => num(n).toLocaleString("it-IT", { maximumFractionDigits: d, useGrouping: "always" });
   const G$ = (n) => { n = num(n); const a = Math.abs(n), f = (x) => x.toLocaleString("it-IT", { maximumFractionDigits: 2 });
     return a >= 1e15 ? n.toExponential(2).replace(".", ",").replace("e+", "e") : a >= 1e12 ? `${f(n / 1e12)} bln` : a >= 1e9 ? `${f(n / 1e9)} mld` : a >= 1e6 ? `${f(n / 1e6)} mln` : a >= 1e4 ? `${Math.round(n / 1e3).toLocaleString("it-IT")}k` : N(n); };
   const safe = (f, d = null) => { try { return f() } catch (e) { return d } };
@@ -1565,10 +1566,12 @@ const Guides = (() => {
       const must = [["bomb10x", "10x Bomb Recharge"], ["relic", "Relic Chest"], ["arch", "secondi di Archaeology"], ["fishOrCherry", "Fishing Ticks"]];
       const opt = [["ore", "2x Ore"], ["vein", "3x Vein"], ["star", "2x Star Spawn"], ["gs", "2x Game Speed"], ["itemChests", "Item Chest"]];
       const buy = set.buy || {};
+      let missN = 0;
+      if (P.ob < 37) { if (!buy.bomb10x) missN = 1; }
       if (P.ob < 37) todo.push(`Dai Lootbug compra il 10x Bomb Recharge (rende più gemme di quante ne costa)${buy.bomb10x ? ", che già prendi," : ""} e il 2x Game Speed: con i Freebie si ripaga. Il resto aspetta la fine della Plat Strat.`);
       else {
         const fishOk = enhSpent >= 25000;
-        const missMust = must.filter(([k]) => !buy[k] && !(k === "fishOrCherry" && !fishOk));
+        const missMust = must.filter(([k]) => !buy[k] && !(k === "fishOrCherry" && !fishOk)); missN = missMust.length;
         todo.push(missMust.length ? `Dai Lootbug compra sempre: ${missMust.map((x) => x[1]).join(", ")} (vanno a tempo).` : `Dai Lootbug compri già le voci da prendere sempre (10x, Relic Chest, secondi di Archaeology${fishOk ? ", Fishing Ticks" : ""}).`);
         if (!fishOk) todo.push("Fishing Ticks dai Lootbug solo dopo aver investito 25–50k gemme negli enhance di pesca.");
       }
@@ -1580,7 +1583,12 @@ const Guides = (() => {
       if (G.trib(6) < 3 && G.trib(6) >= 2 && R && R.bombs) { const gb = (R.sources.find((s) => s.id === "bombs") || {}).gems || 0; const gain = gb * 0.25; if (gain > 0) todo.push({ small: true, t: `Golden Gem Bomb (Tributo 2 del Glimmering Geoduck): circa +${N(gain)} gemme/h, si ripaga in ${N(1.1e6 / gain / 24, 0)} giorni.` }); }
       let gsg = gemGuide(G, set, gen, enhSpent);
       if (gsg && gsg.rows.every((x) => x.ok === true)) { state.push(`Ordine di spesa della wiki per ${gsg.title}: tutto fatto.`); gsg = null; }
-      T({ id: "gemme", title: "Gemme", state, todo, rows: gsg ? gsg.rows : null, rowsTitle: gsg ? `Ordine di spesa della wiki (${gsg.title})` : null, why: ["Le voci a tempo (reliquie, Archaeology, pesca) non si recuperano dopo: per questo il Discord le considera obbligatorie."], src: "Motore dell'app; fissato Lootbug (Discord); wiki Obelisk" });
+      const gsgN = gsg ? gsg.rows.filter((x) => x.ok === false).length : 0;
+      const gemB = [{ k: "info", t: `${N(gemsH)} gemme/h` }];
+      if (missN) gemB.push({ k: "act", t: `Lootbug: ${missN} da comprare` });
+      if (gsgN) gemB.push({ k: "act", t: `${gsgN} ${gsgN === 1 ? "acquisto" : "acquisti"} della wiki da fare` });
+      if (!missN && !gsgN) gemB.push({ k: "ok", t: "acquisti a posto" });
+      T({ id: "gemme", title: "Gemme", badges: gemB, state, todo, rows: gsg ? gsg.rows : null, rowsTitle: gsg ? `Ordine di spesa della wiki (${gsg.title})` : null, why: ["Le voci a tempo (reliquie, Archaeology, pesca) non si recuperano dopo: per questo il Discord le considera obbligatorie."], src: "Motore dell'app; fissato Lootbug (Discord); wiki Obelisk" });
     }
     // ---- Bombe
     {
@@ -1590,7 +1598,11 @@ const Guides = (() => {
       if (G.bombCap < 100000) todo.push("Sotto i 100k di capacità: cariche Cherry sulla Battery, per far crescere il cap. Giro quando torni dall'idle: spara le Battery sulle cariche della Cherry; poi Gem e Infinity; poi D20 → Cherry → Battery finché ricaricano; poi di nuovo Gem e Infinity; rimetti la Cherry in automatico.");
       else if (!(G.sk(60) && G.statue(3, 3) >= 1)) todo.push(`Per passare al D20 servono la skill Obelisk Mincer${G.sk(60) ? " (fatta)" : ""} e la statua della Natura del World 4${G.statue(3, 3) >= 1 ? " (fatta)" : ""}, con gli upgrade del Workshop su Free Bomb, Triple Cherry e cariche D20.`);
       todo.push("Se non stai farmando, autobomba la Cherry (sfrutta il 3x) e spendi le cariche sulla bomba della rotazione. Per minerali Bomb of Plenty, per vene Veinmorpher.");
-      T({ id: "bombe", title: "Bombe", state, todo, why: ["Il bomb cap fa crescere tutto all'inizio; dopo i 100k le gemme diventano il collo di bottiglia e la Gem Bomb la fonte principale."], src: "Wiki Cherry Bomb Guide e FAQ; fissato di ZanyT (ob0-23)", tab: "bombe" });
+      const bombB = [{ k: "info", t: `cap ${G$(G.bombCap)}` }];
+      if (G.bombCap < 100000) bombB.push({ k: "act", t: "Cherry sulla Battery" });
+      if (rv && rv.best && rv.best[1] - rv.current > 0.5) bombB.push({ k: "act", t: `passa a ${rv.best[0] === "gem" ? "Gem" : rv.best[0] === "d20" ? "D20" : "Battery"}: +${N(rv.best[1] - rv.current)}/h` });
+      else if (rv && rv.vals) bombB.push({ k: "ok", t: "rotazione migliore" });
+      T({ id: "bombe", title: "Bombe", badges: bombB, state, todo, why: ["Il bomb cap fa crescere tutto all'inizio; dopo i 100k le gemme diventano il collo di bottiglia e la Gem Bomb la fonte principale."], src: "Wiki Cherry Bomb Guide e FAQ; fissato di ZanyT (ob0-23)", tab: "bombe" });
     }
     // ---- Droni
     {
@@ -1605,7 +1617,12 @@ const Guides = (() => {
       const capList = P.drones.filter((d) => d.owned && d.unlock <= P.ob && DRONE_CAP[d.key]).map((d) => { const c = capSources(G, d.key); return `${d.name} (grado ${d.grade}, massimo di gioco ${c.max}): ${capTxt(G, d.key)}`; });
       if (capList.length) todo.push({ t: "Da dove arriva il grado massimo (✓ ce l'hai, ○ ti manca, ? non è nell'export). Se un drone è fermo, è il massimo che va alzato:", plain: capList });
       if (G.worlds >= 3 && P.ob >= 60) todo.push({ check: [["infElixir", "Elixir Infernal"], ["infStarburst", "Starburst Infernal"], ["infMidas", "Midas Infernal"], ["infBear", "Bear Infernal"], ["infFrogger", "Frogger Infernal"], ["infAngler", "Angler Infernal"]], t: "Droni Infernal: un drone diventa Infernal per caso mentre è equipaggiato e rifornito (10–20 giorni in media). Quando uno è fatto, metti al suo posto uno ancora da fare." });
-      T({ id: "droni", title: "Droni", state, rows, todo, why: ["Gli assetti sono calcolati con il motore dell'app sui tuoi numeri: il guadagno è in gemme/h rispetto a ora, il resto è quello che l'assetto farma."], src: "Motore dell'app; World 3 Checklist; canale ob51-61", tab: "droni", input: P.ob >= 40 && G.worlds <= 3 ? "gen" : null });
+      const droneB = [{ k: cur.length > slots ? "bad" : "info", t: `${cur.length}/${slots} slot` }];
+      const bestSet = setups.filter((x) => !x.same).sort((a, b) => b.gain - a.gain)[0];
+      if (bestSet && bestSet.gain > 50) droneB.push({ k: "act", t: `assetto migliore: +${N(bestSet.gain)}/h` });
+      if (owned("prism") && G.worlds < 4 && cur.includes("prism")) droneB.push({ k: "act", t: "togli il Prism" });
+      if (droneB.length === 1) droneB.push({ k: "ok", t: "assetto a posto" });
+      T({ id: "droni", title: "Droni", badges: droneB, state, rows, todo, why: ["Gli assetti sono calcolati con il motore dell'app sui tuoi numeri: il guadagno è in gemme/h rispetto a ora, il resto è quello che l'assetto farma."], src: "Motore dell'app; World 3 Checklist; canale ob51-61", tab: "droni", input: P.ob >= 40 && G.worlds <= 3 ? "gen" : null });
     }
     // ---- Pesca
     if (P.ob >= 37) {
@@ -1636,7 +1653,10 @@ const Guides = (() => {
       else sushi.push("Ultime sessioni: Infernal di Melting Gibbous e Blackened Basker e dei pesci dei moli T2.");
       if (!early) todo.push(sushi.join(" "));
       if (!early) todo.push(`Per pescare prima un leggendario, con la potenza del molo al massimo: Angler (grado ${G.grade("angler")}; più probabilità con la quest del Mr Nibbles, ora ${G.quest(12)}, e il Tributo 2 del molo 10), Tick Speed, sushi (Sushi Ticks+ e carta Sushi), meno tick richiesti (Tributo 1 del Cthulhu, Motley School, enhance Tier 2), tick extra (Elixir, Mr Nibbles, Black Hole 12, Pisces, carta Cthulhu) e tick dai Lootbug. Ora: riduzione tick ${N(num(S.fishing_tick_reduction_seconds))} s, Double Tick ${N(num(S.fishing_double_tick_chance))}%, Triple Tick ${N(num(S.fishing_triple_tick_chance))}%.`);
-      T({ id: "pesca", title: "Pesca e tributi", state, rows, todo, why: ["I tributi sbloccano i passi grandi (4° drone, Golden Gem Bomb, carte Infernal); gli enhance sono il modo di spendere le gemme che avanzano."], src: "Wiki Fishing; World 3 Checklist; «Am I Ready for World 4?»; guida alla stampa del sushi (ob62-63)", tab: "pesca" });
+      const fishB = early ? [{ k: "info", t: `moli ${Math.min(6, 1 + G.fishUpg(2))}/6` }, { k: "info", t: `enhance: ${G$(enhSpent)} gemme` }] : [{ k: "info", t: `tributi 2: ${t2count}/11` }];
+      if (!early && nextTrib) fishB.push({ k: "act", t: `prossimo: ${LEG[nextTrib[0]][0]} T${nextTrib[1]} · ${G$(LEG[nextTrib[0]][nextTrib[1]][1])}` });
+      else if (!early) fishB.push({ k: "ok", t: "tributi fatti" });
+      T({ id: "pesca", title: "Pesca e tributi", badges: fishB, state, rows, todo, why: ["I tributi sbloccano i passi grandi (4° drone, Golden Gem Bomb, carte Infernal); gli enhance sono il modo di spendere le gemme che avanzano."], src: "Wiki Fishing; World 3 Checklist; «Am I Ready for World 4?»; guida alla stampa del sushi (ob62-63)", tab: "pesca" });
     }
     // ---- Stelle e Black Hole
     if (P.ob >= 23) {
@@ -1651,7 +1671,11 @@ const Guides = (() => {
       if (!G.sk(53) || !G.sk(54)) todo.push("Stelle e vene Infernal (skill Astral Forge e Flaming Veins) quando fai 200–300 mln di stelle all'ora con Starfruit e Starburst e 1.000 mld di vene Neon all'ora.");
       const SN = [[2, "Gemini"], [1, "Taurus"], [5, "Virgo"], [7, "Scorpio"], [8, "Sagittarius"], [11, "Pisces"]];
       state.push(`Livelli: ${SN.map(([i, n]) => `${n} ${G.star(i)}`).join(", ")}.`);
-      T({ id: "stelle", title: G.worlds >= 3 ? "Stelle e Black Hole" : "Stelle", state, rows, todo, why: ["I livelli del Black Hole costano vene e stelle (una delle prime, da Aries a Pisces, e una delle ultime, da Ophiuchus a Cetus)."], src: "Wiki Stargazing; IOM Star Gain Checklist (ZanyT); canali ob30-36 e ob51-61", input: "fpm" });
+      const starB = [];
+      if (G.worlds >= 3) starB.push({ k: G.bh >= 30 ? "ok" : "info", t: `Black Hole ${G.bh}` });
+      if (starX > 1.05) starB.push({ k: "act", t: `assetto stelle: ×${N(starX, 1)}` });
+      else starB.push({ k: "info", t: `${G$(stNow.starH)} stelle/h` });
+      T({ id: "stelle", title: G.worlds >= 3 ? "Stelle e Black Hole" : "Stelle", badges: starB, state, rows, todo, why: ["I livelli del Black Hole costano vene e stelle (una delle prime, da Aries a Pisces, e una delle ultime, da Ophiuchus a Cetus)."], src: "Wiki Stargazing; IOM Star Gain Checklist (ZanyT); canali ob30-36 e ob51-61", input: "fpm" });
     }
     // ---- Pet
     if (P.ob >= 17) {
@@ -1663,7 +1687,12 @@ const Guides = (() => {
       const noSkin = PET.map((n, i) => [n, i]).filter(([, i]) => G.pet(i) && !G.skin(i)).map(([n]) => n), noQS = PET.map((n, i) => [n, i]).filter(([, i]) => G.pet(i) && !G.questSkin(i)).map(([n]) => n);
       if (noSkin.length || noQS.length) todo.push(`Skin mancanti: ${noSkin.join(", ") || "nessuna"}; quest skin mancanti: ${noQS.join(", ") || "nessuna"}.`);
       if (G.skin(14) || P.ob >= 62) todo.push({ t: "Pet Infernal (dopo la skin del Butterfly). Farmabili: Dwarf (prestige al piano 43 con tutti i livelli del piccone), Rabbit (piano 42, tanti contratti), Happy-Bot (prestige a raffica), Axolotl (farmando minerali e barre Infernal), Mr Nibbles (100% sui pesci), Crab (pila piena di Basic Bomb), Nagini (Golden Ore con Lasagna e Bomb of Plenty). Possibili prima del W4: Starfish (super stelle), Whale (spendendo gemme), Butterfly (rane). Da vene: Totem, Dino, Duck. Fortuna pura: Leprechaun (piani rainbow, Lollipop), Penguin (piani golden).", check: PET.map((n, i) => ["infPet" + i, n]) });
-      T({ id: "pet", title: "Pet", state, todo, why: ["I pet Infernal si spuntano a mano: l'export non dice quali carte Infernal hai."], src: "Wiki Pets; World 3 Checklist; «Am I Ready for World 4?»" });
+      const petB = [{ k: "info", t: `${G.petSum} livelli` }];
+      if (G.pet(14) && G.petLv(14) < 5) petB.push({ k: "act", t: `Butterfly ${G.petLv(14)}/5` });
+      if (lowQ.length) petB.push({ k: "act", t: `${lowQ.length} quest sotto il 10` });
+      if (noSkin.length + noQS.length) { const ns = noSkin.length + noQS.length; petB.push({ k: "act", t: `${ns} ${ns === 1 ? "skin mancante" : "skin mancanti"}` }); }
+      if (petB.length === 1) petB.push({ k: "ok", t: "quest e skin a posto" });
+      T({ id: "pet", title: "Pet", badges: petB.slice(0, 3), state, todo, why: ["I pet Infernal si spuntano a mano: l'export non dice quali carte Infernal hai."], src: "Wiki Pets; World 3 Checklist; «Am I Ready for World 4?»" });
     }
     // ---- Statue e monumenti
     {
@@ -1672,7 +1701,12 @@ const Guides = (() => {
       if (G.worlds >= 4) state.push(`World 4: ${G.statues(3, 1)}/9 costruite, ${G.statues(3, 2)} dorate (le statue W4 non si platinano).`);
       const todo = [];
       if (G.worlds === 3) todo.push("Il World 4 parte con −80% di game speed, che le World Quest riducono. Con Black Hole 14 ci sta una statua, ma il 16 serve presto. Aprilo quando hai le raccomandazioni del gioco.");
-      T({ id: "statue", title: "Statue e monumenti", state, todo, why: [], src: "Wiki Construct; «Am I Ready for World 4?»" });
+      const statB = [];
+      const stStep = (w, lab, plat) => { const b = G.statues(w, 1), g = G.statues(w, 2), p = G.statues(w, 3);
+        if (b < 9) return `${lab}: ${9 - b} da costruire`; if (g < 9) return `${lab}: ${9 - g} da dorare`; if (plat && p < 9) return `${lab}: ${9 - p} da platinare`; return null; };
+      [[1, "W1", P.ob >= 37], [2, "W3", true], [3, "W4", false]].filter(([w]) => G.worlds >= (w === 1 ? 1 : w + 1)).forEach(([w, lab, plat]) => { const x = stStep(w, lab, plat); if (x) statB.push({ k: "act", t: x }); });
+      if (!statB.length) statB.push({ k: "ok", t: "tutte fatte" });
+      T({ id: "statue", title: "Statue e monumenti", badges: statB, state, todo, why: [], src: "Wiki Construct; «Am I Ready for World 4?»" });
     }
     // ---- Archaeology
     if (P.ob >= 30) {
@@ -1683,7 +1717,10 @@ const Guides = (() => {
       todo.push("Gemme: skill Block Bonker, carte dorate, gem upgrade (Frammenti 20.782, Stamina 39.305, Esperienza 17.208), skill Avada Keda-.");
       if (P.ob >= 62 && G.idol(24) === 0) todo.push("Ascension: vai appena hai la carta Infernal T3 Legendary dell'Archaeology; gli Hestia bastano quelli che hai; nell'Ascension 1 il Dino si ignora (nella 2 è più facile). Requisiti: Obelisk 66, livello 90 e stage 115 (Ascension 2: livello 100 e stage 150).");
       if (P.ob >= 66) todo.push("Ascension 1: parti con Divinity, dopo il 2/5 di Strength passa a Strength, dal livello 60–70 torna a Divinity. Ogni 2 livelli spingi con Luck (Agility sotto il 50); frammenti: Luck, Divinity e Perception al massimo, il resto Strength. Ascension 2: stessa progressione, Corruption nei frammenti; punta a stage +100, meglio +150, non oltre. Non massimizzare Gleaming Floor Multi, Loot Mod Gain, Super Crit Damage e Maximum Stamina: 15 bastano.");
-      T({ id: "arch", title: "Archaeology", state, todo, why: ["Gli idoli restano dopo l'Ascension: per questo conviene ascendere presto, appena la carta T3 Legendary ti fa risparmiare gli upgrade."], src: "Wiki Archaeology; canali ob30-36, ob42-50; guida all'Ascension (ob66, dopo la patch 2.2)", input: "arch" });
+      const archB = [{ k: "info", t: `Ascension ${gs.asc !== undefined && gs.asc !== null && gs.asc !== "" ? gs.asc : asc}` }];
+      if (gs.stage) archB.push({ k: "info", t: `stage ${gs.stage}` });
+      if (P.ob >= 66 && G.idol(24) === 0) archB.push({ k: "act", t: "Ascension 1 da fare" });
+      T({ id: "arch", title: "Archaeology", badges: archB, state, todo, why: ["Gli idoli restano dopo l'Ascension: per questo conviene ascendere presto, appena la carta T3 Legendary ti fa risparmiare gli upgrade."], src: "Wiki Archaeology; canali ob30-36, ob42-50; guida all'Ascension (ob66, dopo la patch 2.2)", input: "arch" });
     }
     // ---- Carte e Infernal
     if (P.ob >= 15) {
@@ -1693,24 +1730,30 @@ const Guides = (() => {
       const state = [`Carte delle bombe: Gem ${CN[num(c.gem)]}, Cherry ${CN[num(c.cherry)]}, Battery ${CN[num(c.battery)]}, D20 ${CN[num(c.d20)]}.`];
       const todo = ["La regola: i frammenti Poly arrivano solo se la carta è dorata (e con la skill delle Poly); l'Infernal richiede la Poly e il set sbloccato. Anche una carta che sembra inutile va portata a Poly per la skill Polychrome Power."];
       if (P.ob >= 62) todo.push({ t: `Carte Misc Infernal. Come la carta normale: ${MISC_SAME.join(", ")}. Con un metodo proprio:`, list: MISC_DIFF.map(([k, n, how]) => ({ k: "misc_" + k, t: n, how })) });
-      T({ id: "carte", title: P.ob >= 60 ? "Carte e Infernal" : "Carte", state, rows: P.ob >= 60 ? rows : null, todo, why: [], src: "Wiki Cards; FAQ; fissato del canale ob66 (Discord)", tab: "dati" });
+      const cardB = [];
+      const bombLv = [c.gem, c.cherry, c.battery, c.d20].map(num);
+      if (bombLv.every((x) => !x)) cardB.push({ k: "act", t: "carte delle bombe da inserire" });
+      else if (bombLv.some((x) => x < 2)) { const nb = bombLv.filter((x) => x < 2).length; cardB.push({ k: "act", t: `${nb === 1 ? "1 carta delle bombe" : `${nb} carte delle bombe`} da dorare` }); }
+      if (P.ob >= 60) { const known = rows.filter((r) => r.ok !== null); cardB.push({ k: known.every((r) => r.ok) ? "ok" : "info", t: `set Infernal: ${known.filter((r) => r.ok).length}/${known.length}` }); }
+      if (!cardB.length) cardB.push({ k: "ok", t: "carte delle bombe dorate" });
+      T({ id: "carte", title: P.ob >= 60 ? "Carte e Infernal" : "Carte", badges: cardB, state, rows: P.ob >= 60 ? rows : null, todo, why: [], src: "Wiki Cards; FAQ; fissato del canale ob66 (Discord)", tab: "dati" });
     }
     // ---- Eventi
     {
       const mon = Math.pow(2, Math.max(0, G.worlds - 1));
       const state = [nextEvent(), `Premi garantiti ×${mon} per i tuoi monumenti: ${N(655 * mon)} gemme, ${N(72 * mon)} skill bit, ${N(65 * mon)} Relic Chest (Gift, Mythic e skin esclusi).`];
       const todo = ["Gemme: 1.225 all'inizio (velocità evento, 2x valute, 3 × +10% di vita); se non le hai, prima il 2x valute (500).", "Prestige alle onde 10, 20, 30, 55, poi dopo la 105 e la 205. Danno che basta: 144 all'onda 20, 214 alla 30, 389 alla 55, 704 alla 100; oltre, vita e velocità d'attacco.", "I premi raddoppiano per ogni monumento: basta costruirlo prima di riscuotere."];
-      T({ id: "eventi", title: "Eventi", state, todo, why: [], src: "Wiki Events Guide" });
+      T({ id: "eventi", title: "Eventi", badges: [eventBadge()], state, todo, why: [], src: "Wiki Events Guide" });
     }
     // ---- Divine
     if (G.worlds >= 2) {
       const tot = DIVINE.reduce((s, [i]) => s + G.relic(i), 0);
       const state = [`${N(tot)} Divine: ${DIVINE.map(([i, n]) => `${n} ${N(G.relic(i))}`).join(", ")}.`];
       const todo = ["Probabilità base 1 su 25.000. Con 100–200k forzieri e gemme a sufficienza, reroll (200 gemme) regolare: 1 su 12–15k è una buona media.", "Oltre 10 Divine, reroll per una distribuzione migliore: Supernova Multipliers al massimo quando farmi stelle, Rainbow Floor Multi quando farmi minerali e barre. Solo Rainbow Floor Chance non ha limite: tienila bassa, tranne quando farmi barre."];
-      T({ id: "divine", title: "Divine e reliquie", state, todo, why: [], src: "Wiki Relics e FAQ" });
+      T({ id: "divine", title: "Divine e reliquie", badges: [{ k: "info", t: `${N(tot)} Divine` }], state, todo, why: [], src: "Wiki Relics e FAQ" });
     }
     // ---- Arcanist
-    if (P.ob >= 66) T({ id: "arcanist", title: "Arcanist", featured: P.ob >= 71, state: [P.ob >= 71 ? "L'export non contiene dati dell'Arcanist: la guida vale per tutti." : "Si sblocca a Obelisk 71."], todo: [
+    if (P.ob >= 66) T({ id: "arcanist", title: "Arcanist", badges: [{ k: "info", t: P.ob >= 71 ? "guida generale" : "da Obelisk 71" }], featured: P.ob >= 71, state: [P.ob >= 71 ? "L'export non contiene dati dell'Arcanist: la guida vale per tutti." : "Si sblocca a Obelisk 71."], todo: [
       "Quattro schede. Essence: combatti le miniere di essenza (Brittle parte con il 20% di vita, Shiny dà +3 al bottino minimo e massimo). Altar: trasforma l'essenza in rune; il primo altare parte in pausa. Spells: rune e mana per gli incantesimi, con un effetto passivo sempre attivo e uno attivo mentre dura; salgono di livello lanciandoli. Exchange: scambi quasi ogni risorsa in orbi, la valuta degli upgrade.",
       "Orbi: danno e bottino massimo; il bottino massimo quando costa circa il doppio di un livello di danno. Altare: prima la capacità, solo finché non consumi più essenza di quanta ne produci; poi Rune Craft Multi. L'upgrade più importante dei maghi è Exchange Timer Reduction (da 2 ore a 1).",
       "Rune: tienile per sbloccare la prossima essenza o il prossimo altare (i primi quattro altari chiedono Soft, Soft, Dense, Dense).",
@@ -1729,6 +1772,13 @@ const Guides = (() => {
     if (curE) return `Ora c'è l'evento ${curE[1]}, fino alla fine del mese.`;
     const nx = EVENTS.find(([em]) => em > m) || EVENTS[0];
     return `Prossimo evento: ${nx[1]}, dal 1° ${MESI[nx[0] - 1]} per un mese.`;
+  }
+
+  function eventBadge(now = new Date()) {
+    const m = now.getMonth() + 1, curE = EVENTS.find(([em]) => em === m);
+    if (curE) return { k: "act", t: `${curE[1]} in corso` };
+    const nx = EVENTS.find(([em]) => em > m) || EVENTS[0];
+    return { k: "info", t: `${nx[1]} dal 1° ${MESI[nx[0] - 1]}` };
   }
 
   return { evaluate, stars, nextEvent, BANDS, LEG, TRIB_ORDER, PET };
@@ -2210,7 +2260,9 @@ function gExtra(t, r){
   return "";
 }
 function gTopic(t, r){
-  return `<details class="card gtopic" ${t.open?"open":""}><summary><h2>${esc(t.title)}</h2></summary>
+  const B={act:"todo",ok:"fix",info:"check",bad:"you"};
+  const badges=(t.badges||[]).map(b=>`<span class="pill ${B[b.k]||"check"}">${b.k==="ok"?"✓ ":b.k==="act"?"● ":""}${esc(b.t)}</span>`).join("");
+  return `<details class="card gtopic" ${t.open?"open":""}><summary><h2>${esc(t.title)}</h2>${badges?`<span class="gbadges">${badges}</span>`:""}</summary>
     ${t.state&&t.state.length?`<div class="gsec"><h3>Il tuo stato</h3>${t.state.map(x=>`<p>${esc(x)}</p>`).join("")}</div>`:""}
     ${t.rowsTitle?`<h3 class="grt">${esc(t.rowsTitle)}</h3>`:""}${t.rows&&t.rows.length&&t.id!=="droni"?`<ol class="gsteps">${t.rows.map(x=>gItem({t:x.t,ok:x.ok===undefined?null:x.ok,val:x.val})).join("").replace(/<li class="g-man"><span class="ic"[^>]*>–<\/span>/g,'<li class="g-plain"><span class="ic">·</span>')}</ol>`:""}
     ${gExtra(t, r)}
